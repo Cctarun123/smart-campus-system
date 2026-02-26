@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+    <div class="card reveal">
+        <span class="badge">Campus Command Center</span>
+        <h1>Smart AI-Enabled LPU Campus Management</h1>
+        {% if is_student %}
+        <p>Student workspace for food pre-ordering, make-up classes, and remedial attendance.</p>
+        <div class="actions">
+            <a class="btn" href="/food/order/">Order Food</a>
+            <a class="btn btn-outline" href="/makeup/schedule/">Open Make-Up</a>
+            <a class="btn btn-outline" href="/makeup/remedial-attendance/">Open Remedial</a>
+        </div>
+        {% elif is_vendor %}
+        <p>Vendor workspace for food operations, demand analytics, and alert monitoring.</p>
+        <div class="actions">
+            <a class="btn" href="/food/order/">Open Food</a>
+            <a class="btn btn-outline" href="/food/analytics/">Open Analytics</a>
+            <a class="btn btn-outline" href="/notifications/">Open Alerts</a>
+        </div>
+        {% else %}
+        <p>Unified operations for attendance, food pre-ordering, resource planning, and remedial class automation.</p>
+        <div class="actions">
+            <a class="btn" href="/attendance/mark/">Launch Attendance</a>
+            <a class="btn btn-outline" href="/resources/">Open Resource Board</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="card reveal">
+        <h3>Core Modules</h3>
+        {% if not is_student and not is_vendor %}
+            <div class="kpi">
+                <span class="label">Attendance</span>
+                <span class="value">Instant + Automated</span>
+            </div>
+        {% endif %}
+        <div class="kpi">
+            <span class="label">Food Demand</span>
+            <span class="value">Slot-wise Peak Insights</span>
+        </div>
+        <div class="kpi">
+            <span class="label">Remedial Classes</span>
+            <span class="value">Code-Based Tracking</span>
+        </div>
+    </div>
+</section>
+
+<section class="panel-grid">
+    {% if not is_student and not is_vendor %}
+    <article class="card span-4 reveal">
+        <h3>Smart Attendance</h3>
+        <p>One-click faculty marking, absentee detection, and simulated student-parent notifications.</p>
+        <a class="btn" href="/attendance/mark/">Mark Now</a>
+    </article>
+    {% endif %}
+    <article class="card span-4 reveal">
+        <h3>Food Pre-Order</h3>
+        <p>Students pre-book food by break slot to reduce crowd congestion and queue stress.</p>
+        <a class="btn" href="/food/order/">Order Food</a>
+    </article>
+    {% if is_vendor %}
+    <article class="card span-4 reveal">
+        <h3>Food Analytics</h3>
+        <p>Track demand, peak break slots, and order insights for stall planning.</p>
+        <a class="btn" href="/food/analytics/">Open Analytics</a>
+    </article>
+    <article class="card span-4 reveal">
+        <h3>Alerts</h3>
+        <p>Monitor system alerts and notifications related to food operations.</p>
+        <a class="btn" href="/notifications/">Open Alerts</a>
+    </article>
+    {% else %}
+    <article class="card span-4 reveal">
+        <h3>Make-Up Classes</h3>
+        <p>Open scheduled make-up sessions and track class recovery details.</p>
+        <a class="btn" href="/makeup/schedule/">Open Make-Up</a>
+    </article>
+    <article class="card span-4 reveal">
+        <h3>Remedial Attendance</h3>
+        <p>Use remedial code to mark attendance for your make-up session.</p>
+        <a class="btn" href="/makeup/remedial-attendance/">Open Remedial</a>
+    </article>
+    {% endif %}
+</section>
+{% endblock %}

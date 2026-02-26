@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.enroll-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #e5ecea;
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(20, 38, 34, 0.08);
+    padding: 1rem;
+}
+.enroll-wrap h2 { margin: 0 0 0.25rem; color: #21473f; }
+.enroll-wrap p { margin: 0 0 0.9rem; color: #647b76; }
+.enroll-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.enroll-field { margin: 0.4rem 0; }
+.enroll-wrap label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+    font-size: 0.86rem;
+    color: #49645e;
+}
+.enroll-wrap input, .enroll-wrap select {
+    width: 100%;
+    border: 1px solid #dce6e2;
+    border-radius: 10px;
+    padding: 0.58rem 0.62rem;
+}
+#id_face_image { display: none; }
+.cam-card {
+    margin-top: 0.7rem;
+    border: 1px solid #e3ece8;
+    border-radius: 12px;
+    background: #fafdfb;
+    padding: 0.75rem;
+}
+.cam-video {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border: 1px solid #d8e5e1;
+    border-radius: 10px;
+    background: #0f1720;
+}
+.cam-preview {
+    width: 100%;
+    margin-top: 0.55rem;
+    border-radius: 10px;
+    border: 1px solid #d8e5e1;
+    display: none;
+}
+.enroll-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+.enroll-btn {
+    border: 1px solid #d4e2dd;
+    background: #fff;
+    color: #2c554c;
+    border-radius: 10px;
+    padding: 0.56rem 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+.enroll-btn.primary {
+    border-color: #2f7f6a;
+    background: #2f7f6a;
+    color: #fff;
+}
+.enroll-note {
+    margin-top: 0.55rem;
+    color: #647b76;
+    font-size: 0.82rem;
+}
+@media (max-width: 780px) { .enroll-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section class="enroll-wrap">
+    <h2>Enroll Student & Register Face</h2>
+    <p>Use camera to capture student face and save it in database for AI Attendance.</p>
+
+    <form method="post" enctype="multipart/form-data" id="enroll-form">
+        {% csrf_token %}
+
+        <div class="enroll-grid">
+            <div class="enroll-field">
+                <label for="id_student_name">Student Name</label>
+                {{ form.student_name }}
+            </div>
+            <div class="enroll-field">
+                <label for="id_registration_no">Registration Number</label>
+                {{ form.registration_no }}
+            </div>
+            <div class="enroll-field" style="grid-column: 1 / -1;">
+                <label for="id_course">Course (for enrollment)</label>
+                {{ form.course }}
+            </div>
+        </div>
+
+        {{ form.face_image }}
+
+        <div class="cam-card">
+            <label style="margin-bottom:0.4rem;">Camera Capture</label>
+            <video id="cam-video" class="cam-video" autoplay playsinline muted></video>
+            <canvas id="cam-canvas" style="display:none;"></canvas>
+            <img id="cam-preview" class="cam-preview" alt="Captured student face preview">
+            <div class="enroll-actions" style="margin-top:0.6rem;">
+                <button class="enroll-btn" type="button" onclick="openCamera()">Open Camera</button>
+                <button class="enroll-btn" type="button" onclick="captureFace()">Capture Face</button>
+                <button class="enroll-btn" type="button" onclick="retakeFace()">Retake</button>
+            </div>
+            <p id="capture-status" class="enroll-note">Capture a clear front-face image before clicking Register Face.</p>
+        </div>
+
+        <div class="enroll-actions">
+            <button class="enroll-btn" type="submit" name="action" value="register_face">Register Face</button>
+            <button class="enroll-btn primary" type="submit" name="action" value="enroll">Enroll Student</button>
+            <a class="enroll-btn" href="/attendance/mark/">Back to Attendance</a>
+        </div>
+    </form>
+</section>
+
+<script>
+let cameraStream = null;
+
+async function openCamera() {
+  const video = document.getElementById('cam-video');
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = cameraStream;
+    document.getElementById('capture-status').textContent = 'Camera opened. Capture face now.';
+  } catch (e) {
+    document.getElementById('capture-status').textContent = 'Camera unavailable or permission denied.';
+  }
+}
+
+function captureFace() {
+  const video = document.getElementById('cam-video');
+  const canvas = document.getElementById('cam-canvas');
+  const preview = document.getElementById('cam-preview');
+  const input = document.getElementById('id_face_image');
+
+  if (!video.videoWidth) {
+    document.getElementById('capture-status').textContent = 'Open camera first.';
+    return;
+  }
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'student_face.jpg', { type: 'image/jpeg' });
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+
+    preview.src = URL.createObjectURL(blob);
+    preview.style.display = 'block';
+    document.getElementById('capture-status').textContent = 'Face captured and ready for registration.';
+  }, 'image/jpeg', 0.95);
+}
+
+function retakeFace() {
+  const input = document.getElementById('id_face_image');
+  const preview = document.getElementById('cam-preview');
+  input.value = '';
+  preview.src = '';
+  preview.style.display = 'none';
+  document.getElementById('capture-status').textContent = 'Capture a new face photo.';
+}
+
+document.getElementById('enroll-form').addEventListener('submit', function (e) {
+  const input = document.getElementById('id_face_image');
+  if (!input.files || input.files.length === 0) {
+    e.preventDefault();
+    document.getElementById('capture-status').textContent = 'Please capture student face before submitting.';
+  }
+});
+
+window.addEventListener('beforeunload', () => {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach((track) => track.stop());
+  }
+});
+</script>
+{% endblock %}

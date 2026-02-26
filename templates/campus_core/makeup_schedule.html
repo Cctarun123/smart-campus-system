@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card form-card reveal">
+    <span class="badge">Module 4</span>
+    <h2>Schedule Make-Up Class</h2>
+    <p>Generate a unique remedial code for class recovery attendance.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+            <button class="btn" type="submit">Generate Remedial Code</button>
+        </div>
+    </form>
+</section>
+
+<section class="card reveal" style="margin-top:1rem;">
+    <h3>Scheduled Make-Up Classes</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Course</th>
+                <th>Faculty</th>
+                <th>Scheduled For</th>
+                <th>Remedial Code</th>
+                <th>Actions</th>
+            </tr>
+            {% for session in sessions %}
+            <tr>
+                <td>{{ session.course }}</td>
+                <td>{{ session.faculty.username }}</td>
+                <td>{{ session.scheduled_for }}</td>
+                <td>{{ session.remedial_code }}</td>
+                <td>
+                    <a class="btn btn-outline" href="{% url 'makeup-detail' session.id %}">Open</a>
+                    <a class="btn" href="{% url 'makeup-presence-check' session.id %}">Check</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No make-up classes yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}

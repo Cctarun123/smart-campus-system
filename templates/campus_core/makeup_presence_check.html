@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card reveal">
+    <span class="badge">Teacher Check</span>
+    <h2>Remedial Presence Check</h2>
+    <p>{{ makeup.course }} | {{ makeup.scheduled_for }}</p>
+    <div class="panel-grid">
+        <div class="kpi span-4"><span class="label">Total Students</span><span class="value">{{ total_students }}</span></div>
+        <div class="kpi span-4"><span class="label">Present</span><span class="value">{{ present_count }}</span></div>
+        <div class="kpi span-4"><span class="label">Absent</span><span class="value">{{ absent_count }}</span></div>
+    </div>
+    <div style="margin-top: 1rem;">
+        <a class="btn btn-outline" href="{% url 'makeup-detail' makeup.id %}">Back to Make-Up</a>
+    </div>
+</section>
+
+<section class="card reveal" style="margin-top:1rem;">
+    <h3>Student Status</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Student</th>
+                <th>Registration No</th>
+                <th>Status</th>
+                <th>Marked At</th>
+            </tr>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.student.user.get_full_name|default:row.student.user.username }}</td>
+                <td>{{ row.student.registration_no }}</td>
+                <td>
+                    {% if row.is_present %}
+                    <span class="badge" style="color: #067647; background: #ecfdf3; border-color: #a6f4c5;">Present</span>
+                    {% else %}
+                    <span class="badge" style="color: #b42318; background: #fef3f2; border-color: #fecdca;">Absent</span>
+                    {% endif %}
+                </td>
+                <td>{{ row.marked_at|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No students enrolled for this course.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}

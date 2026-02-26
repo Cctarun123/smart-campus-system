@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+    <div class="card reveal">
+        <span class="badge">AI Bonus</span>
+        <h2>AI Integration Preview</h2>
+        <p>This screen is ready for real AI models like face recognition, rush forecasting, and smart alert automation.</p>
+        <div class="kpi" style="margin-top: 0.8rem;">
+            <span class="label">Predicted Peak Slot</span>
+            <span class="value">{{ predicted_peak }}</span>
+        </div>
+    </div>
+    <div class="card reveal">
+        <h3>Inference Metadata</h3>
+        <div class="kpi">
+            <span class="label">Generated At</span>
+            <span class="value">{{ generated_at }}</span>
+        </div>
+        <p>Current prediction is based on recent attendance trend sampling in this demo.</p>
+    </div>
+</section>
+{% endblock %}

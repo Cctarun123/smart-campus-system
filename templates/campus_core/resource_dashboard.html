@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.rm-shell {
+    background: #f4f6fa;
+    border: 1px solid #dfe7ee;
+    border-radius: 22px;
+    padding: 1rem;
+}
+.rm-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0.9rem;
+}
+.rm-side {
+    background: linear-gradient(180deg,#1d3557,#243f66);
+    color: #d8e2f5;
+    border-radius: 18px;
+    padding: 0.95rem;
+}
+.rm-brand { margin: 0; color: #fff; font: 700 1.15rem/1.2 'Space Grotesk', sans-serif; }
+.rm-sub { margin: 0.2rem 0 0.8rem; font-size: 0.82rem; color: #c4d0ea; }
+.rm-nav { display: grid; gap: 0.35rem; }
+.rm-nav a {
+    text-decoration: none;
+    color: #d4def3;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.rm-nav a.active { background: #3d73ca; color: #fff; border-color: #4a84e4; }
+.rm-main { display: grid; gap: 0.8rem; }
+.rm-card {
+    background: #fff;
+    border: 1px solid #e4eaf2;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    padding: 0.9rem;
+}
+.rm-head { display: flex; justify-content: space-between; gap: 0.7rem; align-items: end; }
+.rm-title { margin: 0; color: #1f2937; font: 700 1.25rem/1.2 'Space Grotesk', sans-serif; }
+.rm-muted { margin: 0.2rem 0 0; color: #667085; font-size: 0.86rem; }
+.rm-kpis { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 0.6rem; margin-top: 0.8rem; }
+.rm-kpi {
+    border: 1px solid #e7edf5;
+    border-radius: 12px;
+    background: #fbfcfe;
+    padding: 0.6rem;
+}
+.rm-kpi .label { font-size: 0.72rem; color: #6b7280; text-transform: uppercase; letter-spacing: .04em; }
+.rm-kpi .value { margin-top: 0.22rem; font: 700 1.08rem/1.1 'Space Grotesk', sans-serif; color: #1f2937; }
+.rm-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.8rem; }
+.rm-table-wrap { overflow: auto; border: 1px solid #e6ecf4; border-radius: 12px; }
+.rm-table { width: 100%; border-collapse: collapse; min-width: 620px; }
+.rm-table th, .rm-table td { padding: 0.55rem 0.5rem; border-bottom: 1px solid #edf2f7; text-align: left; font-size: 0.84rem; }
+.rm-table th { background: #f7f9fc; color: #475467; font-weight: 700; }
+.rm-badge {
+    border: 1px solid #d7e3f6;
+    border-radius: 999px;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #325c9b;
+    background: #edf4ff;
+}
+.rm-block-list { display: grid; gap: 0.45rem; }
+.rm-block-item {
+    border: 1px solid #e6edf5;
+    border-radius: 10px;
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+.rm-util { color: #1e3a8a; font-weight: 700; }
+@media (max-width: 1100px) {
+    .rm-grid { grid-template-columns: 1fr; }
+    .rm-kpis { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .rm-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+    .rm-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+</style>
+
+<div class="rm-shell">
+    <div class="rm-grid">
+        <aside class="rm-side">
+            <h3 class="rm-brand">Resource Manager</h3>
+            <p class="rm-sub">College infrastructure control panel</p>
+            <div class="rm-nav">
+                <a href="/" >Dashboard</a>
+                <a href="/resources/" class="active">Resources</a>
+                <a href="/attendance/mark/">Attendance</a>
+                <a href="/food/order/">Food Management</a>
+                <a href="/makeup/schedule/">Class Planner</a>
+                <a href="/notifications/">Alerts</a>
+            </div>
+        </aside>
+
+        <section class="rm-main">
+            <article class="rm-card">
+                <div class="rm-head">
+                    <div>
+                        <h2 class="rm-title">College Resource Management</h2>
+                        <p class="rm-muted">Blocks, classrooms, courses, students and faculty utilization overview.</p>
+                    </div>
+                </div>
+
+                <div class="rm-kpis">
+                    <div class="rm-kpi"><div class="label">Blocks</div><div class="value">{{ total_blocks }}</div></div>
+                    <div class="rm-kpi"><div class="label">Classrooms</div><div class="value">{{ total_classrooms }}</div></div>
+                    <div class="rm-kpi"><div class="label">Courses</div><div class="value">{{ total_courses }}</div></div>
+                    <div class="rm-kpi"><div class="label">Students</div><div class="value">{{ total_students }}</div></div>
+                    <div class="rm-kpi"><div class="label">Faculty</div><div class="value">{{ total_faculty }}</div></div>
+                    <div class="rm-kpi"><div class="label">Capacity Use</div><div class="value">{{ capacity_utilization|floatformat:1 }}%</div></div>
+                </div>
+            </article>
+
+            <div class="rm-layout">
+                <article class="rm-card">
+                    <h3 style="margin:0 0 .55rem;">Course Capacity Utilization</h3>
+                    <div class="rm-table-wrap">
+                        <table class="rm-table">
+                            <tr><th>Course</th><th>Strength</th><th>Capacity</th><th>Utilization</th></tr>
+                            {% for row in course_utilization %}
+                            <tr>
+                                <td>{{ row.course }}</td>
+                                <td>{{ row.strength }}</td>
+                                <td>{{ row.capacity }}</td>
+                                <td><span class="rm-badge">{{ row.utilization|floatformat:1 }}%</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4">No course data available.</td></tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </article>
+
+                <article class="rm-card">
+                    <h3 style="margin:0 0 .55rem;">Faculty Workload</h3>
+                    <div class="rm-table-wrap" style="margin-bottom:.7rem;">
+                        <table class="rm-table" style="min-width: 100%;">
+                            <tr><th>Faculty</th><th>Courses</th></tr>
+                            {% for row in faculty_workload %}
+                            <tr><td>{{ row.faculty_name|default:'Unassigned' }}</td><td>{{ row.total_courses }}</td></tr>
+                            {% empty %}
+                            <tr><td colspan="2">No workload data.</td></tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                    <h3 style="margin:0 0 .45rem;">Block & Classroom Inventory</h3>
+                    <div class="rm-block-list">
+                        {% for block in blocks %}
+                        <div class="rm-block-item">
+                            <div>
+                                <strong>{{ block.name }}</strong>
+                                <div class="rm-muted" style="margin:0; font-size:.78rem;">{{ block.classrooms.count }} classrooms</div>
+                            </div>
+                            <span class="rm-util">{{ block.classrooms.all|length }}</span>
+                        </div>
+                        {% empty %}
+                        <div class="rm-block-item">No blocks configured.</div>
+                        {% endfor %}
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

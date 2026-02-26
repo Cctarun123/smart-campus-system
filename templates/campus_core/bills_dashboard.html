@@ -1,0 +1,557 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.bill-shell {
+    background: #f4f5f7;
+    border-radius: 24px;
+    padding: 1rem;
+}
+.bill-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1.45fr;
+    gap: 1rem;
+}
+.panel {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(220, 224, 230, 0.95);
+    border-radius: 24px;
+    box-shadow: 0 18px 35px rgba(16, 24, 40, 0.08);
+    backdrop-filter: blur(8px);
+    padding: 1.2rem;
+}
+.title {
+    margin: 0;
+    font: 700 1.35rem/1.2 "Space Grotesk", "Poppins", "DM Sans", sans-serif;
+    color: #111827;
+}
+.muted { color: #6b7280; }
+.summary-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 0.6rem;
+}
+.tag {
+    background: #fff;
+    border: 1px solid #e6e8ee;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #374151;
+}
+.list {
+    margin-top: 0.95rem;
+    border: 1px solid #e6e8ee;
+    border-radius: 16px;
+    overflow: hidden;
+}
+.row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 0.5rem;
+    padding: 0.72rem 0.85rem;
+    border-bottom: 1px solid #edf0f4;
+    font-size: 0.93rem;
+}
+.row:last-child { border-bottom: 0; }
+.total-box {
+    margin-top: 0.9rem;
+    border: 1px solid #e6e8ee;
+    border-radius: 16px;
+    padding: 0.75rem 0.85rem;
+}
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.34rem 0;
+    color: #374151;
+}
+.total-main {
+    font-weight: 800;
+    font-size: 1.08rem;
+    color: #111827;
+}
+.split {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.avatars { display: flex; }
+.avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 2px solid #fff;
+    margin-left: -8px;
+    background: #e8ebf1;
+    color: #374151;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+}
+.avatar:first-child { margin-left: 0; }
+.payments {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+.pay-chip {
+    text-align: center;
+    border-radius: 12px;
+    border: 1px solid #e7e9ef;
+    background: #fff;
+    padding: 0.55rem 0.2rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #4b5563;
+}
+.order-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-items: end;
+}
+.side-tabs {
+    display: grid;
+    gap: 0.5rem;
+    width: 92px;
+}
+.side-tab {
+    border: 1px solid #e6e8ee;
+    border-radius: 14px;
+    background: #fff;
+    padding: 0.6rem 0.4rem;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #6b7280;
+}
+.side-tab.active {
+    background: #111827;
+    color: #fff;
+    border-color: #111827;
+}
+.order-layout {
+    margin-top: 0.9rem;
+    display: grid;
+    grid-template-columns: 1fr 96px;
+    gap: 0.9rem;
+}
+.food-list { display: grid; gap: 0.65rem; }
+.food-item {
+    border: 1px solid #e8ebf1;
+    border-radius: 18px;
+    padding: 0.58rem;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 78px 1fr auto;
+    gap: 0.7rem;
+    align-items: center;
+}
+.food-item img {
+    width: 78px;
+    height: 66px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+.food-name { margin: 0; font-weight: 700; color: #1f2937; }
+.food-price { margin: 0.15rem 0 0; color: #6b7280; font-size: 0.88rem; }
+.qty {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.34rem;
+}
+.qty form { margin: 0; }
+.qty button {
+    border: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    background: #f2f4f8;
+    color: #111827;
+    font-weight: 800;
+    cursor: pointer;
+}
+.qty-num { width: 24px; text-align: center; font-size: 0.85rem; font-weight: 700; }
+.add-btn {
+    border: 0;
+    border-radius: 10px;
+    padding: 0.4rem 0.62rem;
+    background: #111827;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.float-cart {
+    position: sticky;
+    bottom: 0.5rem;
+    margin-top: 0.95rem;
+    border: 1px solid #e7e9ef;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 14px 30px rgba(16, 24, 40, 0.12);
+    padding: 0.75rem 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+}
+.pay-panel {
+    margin-top: 0.8rem;
+    border: 1px solid #e7e9ef;
+    border-radius: 16px;
+    padding: 0.75rem;
+    background: #fff;
+}
+.pay-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+.pay-grid form { margin: 0; }
+.upi-toggle {
+    width: 100%;
+    border: 1px solid #dfe3ea;
+    border-radius: 10px;
+    background: #f9fafb;
+    padding: 0.55rem 0.45rem;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: #374151;
+    cursor: pointer;
+}
+.pay-btn {
+    width: 100%;
+    border: 1px solid #dfe3ea;
+    border-radius: 10px;
+    background: #f9fafb;
+    padding: 0.55rem 0.45rem;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: #374151;
+    cursor: pointer;
+}
+.method-btn {
+    width: 100%;
+    border: 1px solid #dfe3ea;
+    border-radius: 10px;
+    background: #f9fafb;
+    padding: 0.55rem 0.45rem;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: #374151;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+}
+.method-btn img { width: 18px; height: 18px; object-fit: contain; }
+.pay-open {
+    border: 0;
+    border-radius: 12px;
+    padding: 0.6rem 0.9rem;
+    background: linear-gradient(135deg, #1f2937, #111827);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+.pay-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    padding: 1rem;
+}
+.pay-modal {
+    width: min(420px, 100%);
+    border-radius: 20px;
+    border: 1px solid #dbe1ea;
+    background: #fff;
+    box-shadow: 0 18px 40px rgba(17, 24, 39, 0.2);
+    overflow: hidden;
+}
+.pm-head {
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #fff;
+}
+.pm-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.pm-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    background: #fff;
+    padding: 2px;
+    object-fit: contain;
+}
+.pm-gpay { background: linear-gradient(135deg, #1a73e8, #4285f4); }
+.pm-phonepe { background: linear-gradient(135deg, #5f259f, #7b3cc2); }
+.pm-paytm { background: linear-gradient(135deg, #00baf2, #36c7f3); }
+.pm-bhim { background: linear-gradient(135deg, #f57c00, #ff9800); }
+.pm-body { padding: 1rem; }
+.pm-qr {
+    width: 230px;
+    height: 230px;
+    object-fit: contain;
+    display: block;
+    margin: 0.4rem auto 0.8rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+}
+.pm-note { text-align: center; color: #6b7280; font-size: 0.86rem; margin: 0 0 0.8rem; }
+.pm-close {
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-weight: 700;
+}
+@media (max-width: 1060px) {
+    .bill-grid { grid-template-columns: 1fr; }
+    .order-layout { grid-template-columns: 1fr; }
+    .side-tabs {
+        width: 100%;
+        grid-template-columns: repeat(3, 1fr);
+        display: grid;
+    }
+}
+</style>
+
+<div class="bill-shell">
+    <div class="bill-grid">
+        <section class="panel">
+            <div class="summary-head">
+                <div>
+                    <h2 class="title">Bill Summary</h2>
+                    <p class="muted" style="margin:0.35rem 0 0;">Dining invoice overview</p>
+                </div>
+                <span class="tag">{{ table_no }}</span>
+            </div>
+
+            <p class="muted" style="margin:0.9rem 0 0.3rem; font-size:0.9rem;">{{ bill_time|date:"d M Y, h:i A" }}</p>
+
+            <div class="list">
+                <div class="row" style="font-weight:700;background:#f8f9fb;">
+                    <span>Item</span>
+                    <span>Qty</span>
+                    <span>Price</span>
+                </div>
+                {% for row in summary_items %}
+                <div class="row">
+                    <span>{{ row.item.name }}</span>
+                    <span>{{ row.qty }}</span>
+                    <span>&#8377;{{ row.line_total|floatformat:2 }}</span>
+                </div>
+                {% empty %}
+                <div class="row" style="grid-template-columns:1fr;">No items added yet.</div>
+                {% endfor %}
+            </div>
+
+            <div class="total-box">
+                <div class="total-line"><span>Subtotal</span><strong>&#8377;{{ subtotal|floatformat:2 }}</strong></div>
+                <div class="total-line"><span>Tax (5%)</span><strong>&#8377;{{ tax|floatformat:2 }}</strong></div>
+                <div class="total-line total-main"><span>Grand Total</span><span>&#8377;{{ grand_total|floatformat:2 }}</span></div>
+            </div>
+
+            <div class="split">
+                <div>
+                    <h3 style="margin:0; font-size:1rem;">Split bill</h3>
+                    <p class="muted" style="margin:0.18rem 0 0; font-size:0.86rem;">Share with friends</p>
+                </div>
+                <div class="avatars">
+                    {% for code in split_friends %}
+                    <span class="avatar">{{ code }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="payments">
+                {% for pay in payment_methods %}
+                <span class="pay-chip">{{ pay }}</span>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="order-head">
+                <div>
+                    <h2 class="title" style="margin-bottom:0.2rem;">GoMeal Restaurant</h2>
+                    <p class="muted" style="margin:0;">Block 34, Lovely Professional University</p>
+                    {% if checkout_details %}
+                    <p class="muted" style="margin:0.35rem 0 0; font-size:0.86rem;">Checkout: {{ checkout_details.student_name }} ({{ checkout_details.break_slot }})</p>
+                    {% else %}
+                    <p class="muted" style="margin:0.35rem 0 0; font-size:0.86rem;">No checkout session. Go to Food Order and press Checkout first.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="order-layout">
+                <div class="food-list">
+                    {% for item in food_items %}
+                    <article class="food-item">
+                        <img src="{{ item.preview_image }}" alt="{{ item.name }}">
+                        <div>
+                            <p class="food-name">{{ item.name }}</p>
+                            <p class="food-price">&#8377;{{ item.price }} per item</p>
+                        </div>
+                        <div>
+                            {% if item.cart_qty %}
+                            <div class="qty">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="dec">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit">-</button>
+                                </form>
+                                <span class="qty-num">{{ item.cart_qty }}</span>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="inc">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit">+</button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="add">
+                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                <button class="add-btn" type="submit">Add</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <aside class="side-tabs">
+                    <span class="side-tab active">Food Items</span>
+                    <span class="side-tab">Total Bill</span>
+                    <span class="side-tab">Friends</span>
+                </aside>
+            </div>
+
+            <div class="float-cart">
+                <div>
+                    <strong>{{ cart_count }} items added</strong>
+                    <p class="muted" style="margin:0.18rem 0 0; font-size:0.85rem;">Total: &#8377;{{ grand_total|floatformat:2 }}</p>
+                </div>
+                <button class="pay-open" type="button" onclick="togglePayMethods()">Pay Now</button>
+            </div>
+
+            <div id="pay-methods" class="pay-panel" style="display:none;">
+                <p style="margin:0 0 0.55rem; font-weight:700; color:#111827;">Payment Option</p>
+                <button class="upi-toggle" type="button" onclick="toggleUpiMethods()">UPI</button>
+                <div id="upi-method-list" class="pay-grid" style="margin-top:0.55rem; display:none;">
+                    {% for upi in upi_methods %}
+                    <button class="method-btn" type="button" onclick="openPaymentModal('{{ upi }}')">
+                        <img src="{% if upi == 'Google Pay' %}https://cdn.simpleicons.org/googlepay/ffffff{% elif upi == 'PhonePe' %}https://cdn.simpleicons.org/phonepe/ffffff{% elif upi == 'Paytm' %}https://cdn.simpleicons.org/paytm/ffffff{% else %}https://cdn.simpleicons.org/googlelens/ffffff{% endif %}" alt="{{ upi }} logo">
+                        {{ upi }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<div id="pay-modal-backdrop" class="pay-modal-backdrop" onclick="closePaymentModal(event)">
+    <div class="pay-modal" onclick="event.stopPropagation()">
+        <div id="pm-head" class="pm-head">
+            <div class="pm-title-wrap">
+                <img id="pm-logo" class="pm-logo" src="" alt="Payment logo">
+                <strong id="pm-title">UPI</strong>
+            </div>
+            <button class="pm-close" type="button" onclick="closePaymentModal()">x</button>
+        </div>
+        <div class="pm-body">
+            <img id="pm-qr" class="pm-qr" alt="Payment QR">
+            <p id="pm-note" class="pm-note"></p>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="pay">
+                <input type="hidden" id="pm-method" name="method" value="">
+                <input type="hidden" name="source" value="qr_scan">
+                <button class="pay-btn" style="width:100%;" type="submit">I Scanned & Paid</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function togglePayMethods() {
+  const panel = document.getElementById("pay-methods");
+  panel.style.display = panel.style.display === "none" ? "block" : "none";
+}
+function toggleUpiMethods() {
+  const panel = document.getElementById("upi-method-list");
+  panel.style.display = panel.style.display === "none" ? "grid" : "none";
+}
+function classByMethod(method) {
+  if (method === "Google Pay") return "pm-gpay";
+  if (method === "PhonePe") return "pm-phonepe";
+  if (method === "Paytm") return "pm-paytm";
+  return "pm-bhim";
+}
+function upiIdByMethod(method) {
+  const map = {
+    "Google Pay": "gpay.gomeal@okhdfcbank",
+    "PhonePe": "phonepe.gomeal@ybl",
+    "Paytm": "paytm.gomeal@paytm",
+    "BHIM UPI": "bhim.gomeal@upi"
+  };
+  return map[method] || "gomeal@upi";
+}
+function logoByMethod(method) {
+  if (method === "Google Pay") return "https://cdn.simpleicons.org/googlepay/111827";
+  if (method === "PhonePe") return "https://cdn.simpleicons.org/phonepe/111827";
+  if (method === "Paytm") return "https://cdn.simpleicons.org/paytm/111827";
+  return "https://cdn.simpleicons.org/googlelens/111827";
+}
+function openPaymentModal(method) {
+  const backdrop = document.getElementById("pay-modal-backdrop");
+  const head = document.getElementById("pm-head");
+  const title = document.getElementById("pm-title");
+  const note = document.getElementById("pm-note");
+  const qr = document.getElementById("pm-qr");
+  const methodField = document.getElementById("pm-method");
+  const logo = document.getElementById("pm-logo");
+
+  head.className = "pm-head " + classByMethod(method);
+  title.textContent = method;
+  methodField.value = method;
+  logo.src = logoByMethod(method);
+  logo.alt = method + " logo";
+
+  const amount = "{{ grand_total|floatformat:2 }}";
+  const randomRef = "LPU" + Math.random().toString(36).slice(2, 10).toUpperCase();
+  const payload = `upi://pay?pa=${encodeURIComponent(upiIdByMethod(method))}&pn=${encodeURIComponent("GoMeal LPU")}&am=${encodeURIComponent(amount)}&cu=INR&tn=${encodeURIComponent("Table {{ table_no }} " + randomRef)}`;
+  qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(payload)}&t=${Date.now()}-${Math.random()}`;
+  note.textContent = `Scan using ${method}. Ref: ${randomRef}`;
+
+  backdrop.style.display = "flex";
+}
+function closePaymentModal(event) {
+  if (!event || event.target.id === "pay-modal-backdrop") {
+    document.getElementById("pay-modal-backdrop").style.display = "none";
+  }
+}
+</script>
+{% endblock %}

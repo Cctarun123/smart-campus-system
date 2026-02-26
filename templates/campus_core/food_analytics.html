@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel-grid">
+    <article class="card span-6 reveal">
+        <span class="badge">Demand</span>
+        <h2>Orders by Food Item</h2>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Item</th><th>Total Quantity</th></tr>
+                {% for row in demand_by_item %}
+                <tr><td>{{ row.item_name }}</td><td>{{ row.total_orders }}</td></tr>
+                {% empty %}
+                <tr><td colspan="2">No orders yet.</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </article>
+
+    <article class="card span-6 reveal">
+        <span class="badge">Peak</span>
+        <h2>Break Slot Congestion</h2>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Break Slot</th><th>Total Orders</th></tr>
+                {% for row in peak_slots %}
+                <tr><td>{{ row.break_slot }}</td><td>{{ row.total_orders }}</td></tr>
+                {% empty %}
+                <tr><td colspan="2">No slot data yet.</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </article>
+</section>
+{% endblock %}

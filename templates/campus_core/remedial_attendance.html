@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card form-card reveal">
+    <span class="badge">Student Access</span>
+    <h2>Mark Remedial Attendance</h2>
+    <p>Enter registration number and remedial code shared by faculty.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+            <button class="btn" type="submit">Submit Attendance</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.oh-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(17, 24, 39, 0.08);
+  padding: 1rem;
+  margin-bottom: 0.9rem;
+}
+.oh-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.7rem;
+}
+.oh-title { margin: 0; font: 700 1.12rem/1.2 "Space Grotesk", sans-serif; }
+.oh-meta { margin: 0.25rem 0 0; color: #6b7280; font-size: 0.88rem; }
+.oh-tag {
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.oh-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.7rem;
+}
+.oh-table th, .oh-table td {
+  padding: 0.5rem 0.4rem;
+  border-bottom: 1px solid #eef2f7;
+  text-align: left;
+  font-size: 0.9rem;
+}
+.oh-table th { color: #4b5563; font-weight: 700; }
+.oh-total {
+  margin-top: 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+}
+</style>
+
+<h2>Order History</h2>
+<p>Paid orders with payment method and item details.</p>
+
+{% for payment in payments %}
+<section class="oh-card">
+  <div class="oh-head">
+    <div>
+      <h3 class="oh-title">{{ payment.student_name }}</h3>
+      <p class="oh-meta">{{ payment.paid_at|date:"d M Y, h:i A" }} | Break Slot: {{ payment.break_slot }}</p>
+    </div>
+    <span class="oh-tag">{{ payment.payment_method }}</span>
+  </div>
+
+  <table class="oh-table">
+    <tr><th>Item</th><th>Qty</th><th>Line Total</th></tr>
+    {% for item in payment.items %}
+    <tr>
+      <td>{{ item.name }}</td>
+      <td>{{ item.qty }}</td>
+      <td>&#8377;{{ item.line_total }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div class="oh-total"><span>Subtotal</span><span>&#8377;{{ payment.subtotal|floatformat:2 }}</span></div>
+  <div class="oh-total"><span>Tax</span><span>&#8377;{{ payment.tax|floatformat:2 }}</span></div>
+  <div class="oh-total"><span>Total</span><span>&#8377;{{ payment.total|floatformat:2 }}</span></div>
+</section>
+{% empty %}
+<section class="oh-card">No paid orders yet.</section>
+{% endfor %}
+{% endblock %}

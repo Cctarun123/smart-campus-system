@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.ts-shell { background:#f4f5f7; border-radius:20px; padding:1rem; border:1px solid #dfe4ea; }
+.ts-grid { display:grid; grid-template-columns: 240px 1fr; gap:1rem; }
+.ts-side {
+  background: linear-gradient(180deg,#1f315d,#1a2a4e);
+  color:#c8d2ef;
+  border-radius:16px;
+  padding:0.9rem;
+  min-height:760px;
+}
+.ts-brand { margin:0; color:#fff; font:700 1.2rem/1.2 'Space Grotesk',sans-serif; }
+.ts-nav { margin-top:1rem; display:grid; gap:0.35rem; }
+.ts-nav a {
+  text-decoration:none; color:#c4d0ef; border-radius:10px; padding:0.48rem 0.6rem;
+  border:1px solid transparent; font-size:0.86rem; font-weight:600;
+}
+.ts-nav a.active { background:#2d4b8d; color:#fff; border-color:#3f61ac; }
+.ts-main { background:#fff; border:1px solid #e5e8ee; border-radius:16px; padding:1rem; box-shadow:0 8px 20px rgba(16,24,40,.08); }
+.ts-head { display:flex; justify-content:space-between; align-items:center; gap:.7rem; margin-bottom:.75rem; flex-wrap:wrap; }
+.ts-title { margin:0; color:#1f2937; font:700 1.2rem/1.2 'Space Grotesk',sans-serif; }
+.ts-range { color:#6b7280; font-size:.86rem; }
+.ts-actions { display:flex; gap:.4rem; flex-wrap:wrap; }
+.ts-btn {
+  border:1px solid #d8dee8; background:#fff; color:#334155; border-radius:9px; padding:.42rem .68rem;
+  font-size:.82rem; font-weight:700; text-decoration:none;
+}
+.ts-btn.primary { background:#3b82f6; color:#fff; border-color:#3b82f6; }
+.ts-table-wrap { overflow:auto; border:1px solid #e8ecf3; border-radius:12px; }
+.ts-table { width:100%; border-collapse:collapse; min-width:900px; }
+.ts-table th,.ts-table td { border-bottom:1px solid #edf1f7; padding:.56rem .5rem; font-size:.84rem; text-align:left; }
+.ts-table th { background:#f7f9fc; color:#4b5563; font-weight:700; }
+.ts-student { font-weight:700; color:#1f2937; }
+.ts-sub { color:#6b7280; font-size:.75rem; }
+.ts-pill { display:inline-block; min-width:48px; text-align:center; border:1px solid #dce4ef; border-radius:7px; padding:.18rem .35rem; background:#fff; }
+.ts-total { font-weight:800; color:#111827; }
+.ts-empty { padding:.8rem; color:#6b7280; }
+@media (max-width:1000px){ .ts-grid{ grid-template-columns:1fr; } .ts-side{ min-height:auto; } }
+</style>
+
+<div class="ts-shell">
+  <div class="ts-grid">
+    <aside class="ts-side">
+      <h3 class="ts-brand">Hubstaff</h3>
+      <div class="ts-nav">
+        <a href="/">Dashboard</a>
+        <a href="/attendance/mark/">Attendance</a>
+        <a class="active" href="/attendance/timesheet/">Weekly Timesheet</a>
+        <a href="/attendance/ai-mark/">AI Attendance</a>
+        <a href="/attendance/enroll/">Register Face</a>
+        <a href="/notifications/">Reports</a>
+      </div>
+    </aside>
+
+    <section class="ts-main">
+      <div class="ts-head">
+        <div>
+          <h2 class="ts-title">Attendance Timesheet</h2>
+          <p class="ts-range">{{ start_date|date:"D, M d" }} - {{ end_date|date:"D, M d, Y" }}</p>
+        </div>
+        <div class="ts-actions">
+          <a class="ts-btn" href="?start={{ prev_start|date:'Y-m-d' }}">&larr; Prev Week</a>
+          <a class="ts-btn" href="?start={{ next_start|date:'Y-m-d' }}">Next Week &rarr;</a>
+          <a class="ts-btn primary" href="/attendance/mark/">Add Attendance</a>
+        </div>
+      </div>
+
+      <div class="ts-table-wrap">
+        <table class="ts-table">
+          <tr>
+            <th>Student</th>
+            {% for day in week_days %}
+            <th>{{ day|date:"D, M d" }}</th>
+            {% endfor %}
+            <th>Total Hours</th>
+            <th>Days Present</th>
+          </tr>
+          {% for row in rows %}
+          <tr>
+            <td>
+              <div class="ts-student">{{ row.student.user.get_full_name|default:row.student.user.username }}</div>
+              <div class="ts-sub">{{ row.student.registration_no }}</div>
+            </td>
+            {% for hours in row.day_hours %}
+            <td><span class="ts-pill">{{ hours }}h</span></td>
+            {% endfor %}
+            <td class="ts-total">{{ row.total_hours }}h</td>
+            <td>{{ row.present_count }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="10" class="ts-empty">No attendance records found for this week.</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

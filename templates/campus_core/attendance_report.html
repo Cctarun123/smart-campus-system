@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card reveal">
+    <span class="badge">Attendance Report</span>
+    <h2>{{ session.course }}</h2>
+    <div class="panel-grid">
+        <div class="kpi span-4"><span class="label">Date</span><span class="value">{{ session.date }}</span></div>
+        <div class="kpi span-4"><span class="label">Time Slot</span><span class="value">{{ session.time_slot }}</span></div>
+        <div class="kpi span-4"><span class="label">Absentees</span><span class="value">{{ absent_count }}</span></div>
+    </div>
+
+    <h3>Student Status</h3>
+    <div class="table-wrap">
+        <table>
+            <tr><th>Student</th><th>Registration No</th><th>Status</th></tr>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.student.user.get_full_name|default:record.student.user.username }}</td>
+                <td>{{ record.student.registration_no }}</td>
+                <td class="{% if record.status == 'PRESENT' %}status-present{% else %}status-absent{% endif %}">{{ record.status }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}

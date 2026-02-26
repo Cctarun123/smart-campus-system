@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card form-card reveal" style="max-width:520px; margin:auto;">
+    <span class="badge">Secure Access</span>
+    <h2>Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+            <button class="btn" type="submit">Sign In</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

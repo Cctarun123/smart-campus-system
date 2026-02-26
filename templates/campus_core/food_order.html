@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.fd-wrap {
+    display: grid;
+    grid-template-columns: 250px 1fr 330px;
+    gap: 1rem;
+}
+.fd-card {
+    background: #fff;
+    border: 1px solid #eef1f5;
+    border-radius: 20px;
+    box-shadow: 0 8px 26px rgba(28, 34, 43, 0.08);
+}
+.fd-side { padding: 1rem; }
+.fd-logo { font: 700 1.45rem/1.1 'Space Grotesk', sans-serif; margin: 0; }
+.fd-sub { color: #7a869a; font-size: 0.78rem; margin: 0.25rem 0 1rem; }
+.fd-nav { display: grid; gap: 0.45rem; }
+.fd-nav-link {
+    display: block;
+    text-decoration: none;
+    border-radius: 14px;
+    padding: 0.66rem 0.75rem;
+    background: #fff;
+    color: #49566d;
+    font-weight: 600;
+    border: 1px solid #eef1f5;
+}
+.fd-nav-link.active {
+    background: linear-gradient(135deg, #ffc107, #ffb300);
+    color: #202733;
+    border: 0;
+}
+.fd-upgrade {
+    margin-top: 1rem;
+    border-radius: 18px;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, #ffd54f, #ffb300);
+    color: #2e2300;
+}
+.fd-upgrade p { color: #463300; margin: 0.5rem 0; font-size: 0.86rem; }
+.fd-main { display: grid; gap: 1rem; }
+.fd-top { display: grid; grid-template-columns: 1fr auto; gap: 0.8rem; align-items: center; }
+.fd-search { position: relative; }
+.fd-search input {
+    width: 100%;
+    padding-left: 2.3rem;
+    border-radius: 14px;
+    border: 1px solid #e9edf2;
+}
+.fd-search .ico {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8a97aa;
+}
+.fd-icons { display: flex; gap: 0.45rem; }
+.fd-icon {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #edf1f6;
+}
+.fd-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    padding: 1.3rem;
+    background: linear-gradient(120deg, #ffd54f, #ffb300 65%, #ff9800);
+    min-height: 180px;
+}
+.fd-hero h3 { margin: 0.45rem 0 0; max-width: 60%; }
+.fd-hero img {
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0;
+    height: 95%;
+    width: 220px;
+    border-radius: 16px;
+    object-fit: cover;
+}
+.fd-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+.fd-dish { padding: 0.6rem; }
+.fd-dish img { width: 100%; height: 148px; object-fit: cover; border-radius: 14px; }
+.fd-discount {
+    display: inline-block;
+    margin-top: 0.55rem;
+    border-radius: 999px;
+    background: #fff8e1;
+    color: #a56a00;
+    border: 1px solid #ffe5a6;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+.fd-meta { display: flex; justify-content: space-between; gap: 0.5rem; align-items: end; }
+.fd-price { font-weight: 700; }
+.fd-btn {
+    border: 0;
+    border-radius: 12px;
+    padding: 0.52rem 0.75rem;
+    background: linear-gradient(135deg, #ffc107, #ffb300);
+    font-weight: 700;
+    color: #2f2500;
+    cursor: pointer;
+}
+.fd-add-form { margin: 0; }
+.fd-recent { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.65rem; }
+.fd-recent img { width: 100%; height: 92px; object-fit: cover; border-radius: 14px; }
+.fd-right { display: grid; gap: 0.8rem; }
+.fd-panel { padding: 1rem; }
+.fd-address {
+    display: flex;
+    gap: 0.55rem;
+    padding: 0.75rem;
+    border-radius: 14px;
+    background: #fafbff;
+    color: #5c6780;
+    margin-top: 0.65rem;
+}
+.fd-order-line { display: flex; justify-content: space-between; font-size: 0.93rem; margin: 0.44rem 0; }
+.fd-check {
+    width: 100%;
+    border: 0;
+    border-radius: 14px;
+    padding: 0.75rem;
+    background: linear-gradient(120deg, #ffd54f, #ffb300);
+    color: #2d2200;
+    font-weight: 800;
+    cursor: pointer;
+}
+.fd-qty {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.fd-qty form { margin: 0; }
+.fd-qty button {
+    border: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    background: #fff4ce;
+    color: #835d00;
+    font-weight: 700;
+    cursor: pointer;
+}
+.fd-link-btn {
+    border: 0;
+    background: transparent;
+    color: #b42318;
+    font-size: 0.82rem;
+    cursor: pointer;
+    padding: 0;
+}
+.fd-form p { margin: 0.55rem 0; }
+.fd-form select, .fd-form input {
+    border-radius: 12px;
+    border: 1px solid #e6ebf3;
+}
+.fd-tools { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+.fd-tools form, .fd-tools button, .fd-tools input { margin: 0; }
+.fd-coupon {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.45rem;
+}
+.fd-vendor-form {
+    display: grid;
+    gap: 0.5rem;
+}
+.fd-vendor-form input {
+    border-radius: 12px;
+    border: 1px solid #e6ebf3;
+}
+.fd-vendor-list {
+    margin-top: 0.75rem;
+    display: grid;
+    gap: 0.5rem;
+}
+.fd-vendor-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid #e8edf4;
+    border-radius: 12px;
+    padding: 0.5rem 0.6rem;
+    background: #fff;
+}
+@media (max-width: 1200px) {
+    .fd-wrap { grid-template-columns: 1fr; }
+    .fd-recent { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+    .fd-grid { grid-template-columns: 1fr; }
+    .fd-hero img { display: none; }
+    .fd-hero h3 { max-width: 100%; }
+}
+</style>
+
+<div class="fd-wrap">
+    <aside class="fd-card fd-side">
+        <h2 class="fd-logo">GoMeal</h2>
+        <p class="fd-sub">Premium Food Pre-Order</p>
+        <div class="fd-nav">
+            <a class="fd-nav-link active" href="/food/order/">Dashboard</a>
+            <a class="fd-nav-link" href="/food/history/">Order History</a>
+            <a class="fd-nav-link" href="/food/bills/">Bills</a>
+        </div>
+        <div class="fd-upgrade">
+            <strong>Upgrade Plan</strong>
+            <p>Unlock faster checkout, priority prep and premium meal combos.</p>
+            <a class="fd-nav-link active" style="padding:0.45rem 0.7rem; display:inline-block;" href="/ai-preview/">Upgrade</a>
+        </div>
+    </aside>
+
+    <section class="fd-main">
+        <div class="fd-top">
+            <div>
+                <h2 style="margin-bottom:0.2rem;">Hello, User</h2>
+                <p style="margin:0;">Ready to pre-order your next meal?</p>
+            </div>
+            <div class="fd-icons">
+                <span class="fd-icon">N</span>
+                <span class="fd-icon">P</span>
+            </div>
+        </div>
+
+        <form method="get" class="fd-search">
+            <span class="ico">S</span>
+            <input type="text" name="q" value="{{ search_query }}" placeholder="What do you want eat today...">
+            <input type="hidden" name="category" value="{{ active_category }}">
+        </form>
+
+        <div class="fd-hero fd-card" id="popular">
+            <span class="badge" style="background:#fff6cf;border-color:#ffe38e;color:#8a5e00;">Promo</span>
+            <h3>Get Discount Voucher Up To 20%</h3>
+            <a class="fd-nav-link active" href="#summary" style="display:inline-block;margin-top:0.8rem;">Order Now</a>
+            <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=900&q=80" alt="Happy person holding food">
+        </div>
+
+        <div>
+            <h3>Popular Dishes</h3>
+            <div class="fd-grid">
+                {% for item in popular_items %}
+                <article class="fd-card fd-dish">
+                    <img src="{{ item.preview_image }}" alt="{{ item.name }}">
+                    <span class="fd-discount">15% off</span>
+                    <h4 style="margin:0.45rem 0 0.2rem;">{{ item.name }}</h4>
+                    <p style="margin:0;color:#f59e0b;">***** <span style="color:#75839a;">({{ item.rating|floatformat:1 }})</span></p>
+                    <div class="fd-meta">
+                        <span class="fd-price">&#8377;{{ item.price }}</span>
+                        <form method="post" class="fd-add-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <button class="fd-btn" type="submit">+ Add{% if item.in_cart_qty %} ({{ item.in_cart_qty }}){% endif %}</button>
+                        </form>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="fd-card" style="padding:1rem;grid-column:1/-1;">No dish found for current filter. Try another search.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <h3>Recent Orders</h3>
+            <div class="fd-recent">
+                {% for order in recent_orders %}
+                <form method="post" class="fd-card" style="padding:0.35rem;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="item_id" value="{{ order.item.id }}">
+                    <button type="submit" style="border:0;background:transparent;padding:0;width:100%;cursor:pointer;">
+                        <img src="{{ order.preview_image }}" alt="{{ order.item.name }}">
+                    </button>
+                </form>
+                {% empty %}
+                <div class="fd-card" style="padding:1rem;grid-column:1/-1;">No recent orders yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <aside class="fd-right" id="summary">
+        <section class="fd-card fd-panel">
+            <h3 style="margin-bottom:0.6rem;">Order Summary ({{ cart_count }} items)</h3>
+
+            {% for row in summary_items %}
+            <div class="fd-order-line">
+                <span>{{ row.item.name }}</span>
+                <strong>&#8377;{{ row.line_total|floatformat:2 }}</strong>
+            </div>
+            <div class="fd-order-line" style="margin-top:-0.2rem;">
+                <div class="fd-qty">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="dec">
+                        <input type="hidden" name="item_id" value="{{ row.item_id }}">
+                        <button type="submit">-</button>
+                    </form>
+                    <span>{{ row.qty }}</span>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="inc">
+                        <input type="hidden" name="item_id" value="{{ row.item_id }}">
+                        <button type="submit">+</button>
+                    </form>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove">
+                    <input type="hidden" name="item_id" value="{{ row.item_id }}">
+                    <button class="fd-link-btn" type="submit">Remove</button>
+                </form>
+            </div>
+            {% empty %}
+            <p style="margin:0.4rem 0 0.8rem;">Your cart is empty. Add dishes from the left panel.</p>
+            {% endfor %}
+
+            <hr style="border:none;border-top:1px solid #edf1f6;margin:0.9rem 0;">
+            <div class="fd-order-line"><span>Subtotal</span><strong>&#8377;{{ subtotal|floatformat:2 }}</strong></div>
+            <div class="fd-order-line"><span>Delivery</span><strong>&#8377;{{ delivery_fee|floatformat:2 }}</strong></div>
+            <div class="fd-order-line"><span>Discount{% if applied_coupon %} ({{ applied_coupon }}){% endif %}</span><strong>-&#8377;{{ discount_amount|floatformat:2 }}</strong></div>
+            <div class="fd-order-line" style="font-size:1rem;"><span><strong>Total</strong></span><strong>&#8377;{{ total|floatformat:2 }}</strong></div>
+
+            <form method="post" class="fd-coupon" style="margin-top:0.6rem;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="apply_coupon">
+                <input type="text" name="coupon_code" value="{{ applied_coupon }}" placeholder="Apply coupon code">
+                <button class="fd-btn" type="submit">Apply</button>
+            </form>
+
+            <form method="post" class="fd-form" style="margin-top:0.7rem;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="checkout">
+                {{ checkout_form.as_p }}
+                <button class="fd-check" type="submit">Checkout</button>
+            </form>
+
+            <div class="fd-tools">
+                <form method="post" style="width:100%;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="clear_cart">
+                    <button class="fd-nav-link" style="width:100%;cursor:pointer;" type="submit">Clear Cart</button>
+                </form>
+            </div>
+        </section>
+
+        {% if is_vendor %}
+        <section class="fd-card fd-panel" id="vendor-manage">
+            <h3 style="margin-bottom:0.5rem;">Manage Food Items</h3>
+            <form method="post" class="fd-vendor-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="vendor_add_item">
+                <input type="text" name="item_name" placeholder="Food name (e.g. Veg Burger)" required>
+                <input type="number" name="item_price" step="0.01" min="1" placeholder="Price in rupees" required>
+                <input type="url" name="item_image_url" placeholder="Image URL (optional)">
+                <button class="fd-btn" type="submit">Add / Update Item</button>
+            </form>
+
+            <div class="fd-vendor-list">
+                {% for item in vendor_items %}
+                <div class="fd-vendor-row">
+                    <div>
+                        <strong>{{ item.name }}</strong>
+                        <div style="font-size:0.84rem;color:#6b7280;">&#8377;{{ item.price }}</div>
+                    </div>
+                    <form method="post" style="margin:0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="vendor_remove_item">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <button class="fd-link-btn" type="submit">Remove</button>
+                    </form>
+                </div>
+                {% empty %}
+                <p style="margin:0.2rem 0 0;color:#6b7280;">No items in your stall yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}

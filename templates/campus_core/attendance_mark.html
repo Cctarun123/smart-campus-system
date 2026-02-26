@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.att-wrap {
+    background: #f5f6fa;
+    border-radius: 22px;
+    border: 1px solid #d9e3e1;
+    padding: 1rem;
+}
+.att-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0.9rem;
+}
+.att-card {
+    background: #fff;
+    border: 1px solid #e6eceb;
+    border-radius: 18px;
+    box-shadow: 0 8px 22px rgba(18, 35, 31, 0.08);
+}
+.att-side { padding: 0.9rem; }
+.att-logo { margin: 0; font: 700 1.15rem/1.2 "Space Grotesk", sans-serif; color: #244d43; }
+.att-sub { margin: 0.2rem 0 0.8rem; font-size: 0.82rem; color: #6b7c78; }
+.att-nav { display: grid; gap: 0.4rem; }
+.att-nav-item {
+    text-decoration: none;
+    padding: 0.5rem 0.6rem;
+    border-radius: 10px;
+    border: 1px solid #e5ece9;
+    color: #556b66;
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+.att-nav-item.active {
+    background: #2f7f6a;
+    color: #fff;
+    border-color: #2f7f6a;
+}
+.att-cal {
+    margin-top: 0.8rem;
+    border: 1px solid #e7eeec;
+    border-radius: 12px;
+    padding: 0.65rem;
+    background: #fbfdfc;
+}
+.att-cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+}
+.att-cal h4 { margin: 0; font-size: 0.85rem; color: #3a5f56; }
+.att-cal-nav {
+    border: 1px solid #dce7e4;
+    background: #fff;
+    color: #3a5f56;
+    border-radius: 8px;
+    width: 22px;
+    height: 22px;
+    line-height: 20px;
+    text-align: center;
+    font-weight: 700;
+    cursor: pointer;
+}
+.att-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.2rem;
+    font-size: 0.72rem;
+    color: #6e837e;
+    text-align: center;
+}
+.att-day {
+    padding: 0.22rem 0;
+    border-radius: 7px;
+}
+.att-day.empty { visibility: hidden; }
+.att-day.mark { background: #d8efe8; color: #2f7f6a; font-weight: 700; }
+.att-filter {
+    margin-top: 0.8rem;
+    display: grid;
+    gap: 0.55rem;
+}
+.att-filter label {
+    display: block;
+    margin-bottom: 0.22rem;
+    color: #4f6560;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.att-filter select, .att-filter input {
+    width: 100%;
+    border: 1px solid #dfe8e5;
+    border-radius: 10px;
+    padding: 0.5rem 0.6rem;
+    background: #fff;
+}
+.att-main { padding: 0.9rem; }
+.att-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.7rem;
+}
+.att-head h2 { margin: 0; font-size: 1.26rem; color: #1f3b35; }
+.att-head p { margin: 0.25rem 0 0; color: #667b76; font-size: 0.86rem; }
+.att-tools { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+.att-btn {
+    border: 1px solid #d6e3de;
+    border-radius: 10px;
+    padding: 0.46rem 0.7rem;
+    background: #fff;
+    color: #2b554b;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.att-btn.primary {
+    background: #2f7f6a;
+    color: #fff;
+    border-color: #2f7f6a;
+}
+.att-table-wrap {
+    border: 1px solid #e5ecea;
+    border-radius: 14px;
+    overflow: auto;
+    background: #fff;
+}
+.att-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+.att-table th, .att-table td {
+    padding: 0.6rem 0.55rem;
+    border-bottom: 1px solid #eef3f1;
+    text-align: left;
+    font-size: 0.86rem;
+}
+.att-table th {
+    background: #f1f7f5;
+    color: #4a6660;
+    font-weight: 700;
+}
+.att-status {
+    display: inline-flex;
+    gap: 0.3rem;
+}
+.stat-btn {
+    border: 1px solid #dce8e4;
+    border-radius: 999px;
+    background: #fff;
+    color: #68827b;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 0.2rem 0.52rem;
+    cursor: pointer;
+}
+.stat-btn.active {
+    background: #2f7f6a;
+    color: #fff;
+    border-color: #2f7f6a;
+}
+.stat-btn.abs.active { background: #cc3f5a; border-color: #cc3f5a; }
+.stat-btn.late { cursor: default; }
+.att-foot {
+    margin-top: 0.55rem;
+    font-size: 0.78rem;
+    color: #6e807c;
+}
+.att-hidden { display: none; }
+@media (max-width: 980px) {
+    .att-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="att-wrap">
+    <form method="post" id="attendance-form">
+        {% csrf_token %}
+        <div class="att-grid">
+            <aside class="att-card att-side">
+                <h3 class="att-logo">THE PORTAL</h3>
+                <p class="att-sub">Smart attendance workspace</p>
+
+                <div class="att-nav">
+                    <a class="att-nav-item" href="/">My Dashboard</a>
+                    <a class="att-nav-item" href="/resources/">Course</a>
+                    <a class="att-nav-item active" href="/attendance/mark/">Attendance</a>
+                    <a class="att-nav-item" href="/attendance/timesheet/">Timesheet</a>
+                    <a class="att-nav-item" href="/notifications/">Communication</a>
+                </div>
+
+                <div class="att-cal">
+                    <div class="att-cal-head">
+                        <button class="att-cal-nav" type="button" onclick="changeMonth(-1)">&lt;</button>
+                        <h4 id="calendar-title">Month YYYY</h4>
+                        <button class="att-cal-nav" type="button" onclick="changeMonth(1)">&gt;</button>
+                    </div>
+                    <div class="att-cal-grid" id="calendar-grid"></div>
+                </div>
+
+                <div class="att-filter">
+                    <div>
+                        <label for="id_course">Course</label>
+                        {{ form.course }}
+                    </div>
+                    <div>
+                        <label for="id_date">Date</label>
+                        {{ form.date }}
+                    </div>
+                    <div>
+                        <label for="id_time_slot">Time Slot</label>
+                        {{ form.time_slot }}
+                    </div>
+                </div>
+            </aside>
+
+            <section class="att-card att-main">
+                <div class="att-head">
+                    <div>
+                        <h2>Attendance</h2>
+                        <p>Mark attendance. Present students are saved; others are auto-absent.</p>
+                    </div>
+                    <div class="att-tools">
+                        <a class="att-btn" href="/attendance/enroll/">Enroll Student</a>
+                        <a class="att-btn" href="/attendance/ai-mark/">AI Attendance</a>
+                        <button class="att-btn" type="button" onclick="markAllPresent()">Mark All Present</button>
+                        <button class="att-btn" type="button" onclick="markAllAbsent()">Mark All Absent</button>
+                        <button class="att-btn primary" type="submit">Save Attendance</button>
+                    </div>
+                </div>
+
+                <div class="att-table-wrap">
+                    <table class="att-table">
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Status</th>
+                            <th>Total Attd. Hours</th>
+                            <th>Class</th>
+                        </tr>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.registration_no }}</td>
+                            <td>{{ student.user.get_full_name|default:student.user.username }}</td>
+                            <td>
+                                <div class="att-status" data-student="{{ student.id }}">
+                                    <button type="button" class="stat-btn pres {% if student.id|stringformat:'s' in selected_present_ids %}active{% endif %}" onclick="setStatus('{{ student.id }}', 'present')">Present</button>
+                                    <button type="button" class="stat-btn abs {% if student.id|stringformat:'s' not in selected_present_ids %}active{% endif %}" onclick="setStatus('{{ student.id }}', 'absent')">Absent</button>
+                                    <button type="button" class="stat-btn late">Late</button>
+                                </div>
+                                <input class="att-hidden present-check" type="checkbox" name="present_students" value="{{ student.id }}" id="std_{{ student.id }}" {% if student.id|stringformat:'s' in selected_present_ids %}checked{% endif %}>
+                            </td>
+                            <td>12 Hours</td>
+                            <td>Enrolled</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5">No students found for selected course.</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% if form.errors %}
+                <p class="att-foot" style="color:#b42318;">Please correct the form errors and try again.</p>
+                {% else %}
+                <p class="att-foot">Tip: Changing course reloads the student list for that course.</p>
+                {% endif %}
+            </section>
+        </div>
+    </form>
+</div>
+
+<script>
+function setStatus(studentId, status) {
+  const check = document.getElementById("std_" + studentId);
+  const group = document.querySelector('[data-student="' + studentId + '"]');
+  if (!check || !group) return;
+  const pres = group.querySelector('.pres');
+  const abs = group.querySelector('.abs');
+  if (status === 'present') {
+    check.checked = true;
+    pres.classList.add('active');
+    abs.classList.remove('active');
+  } else {
+    check.checked = false;
+    abs.classList.add('active');
+    pres.classList.remove('active');
+  }
+}
+function markAllPresent() {
+  document.querySelectorAll('.present-check').forEach((box) => {
+    box.checked = true;
+    setStatus(box.value, 'present');
+  });
+}
+function markAllAbsent() {
+  document.querySelectorAll('.present-check').forEach((box) => {
+    box.checked = false;
+    setStatus(box.value, 'absent');
+  });
+}
+const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const dayNames = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+let calendarDate = null;
+
+function initCalendar() {
+  const dateInput = document.getElementById("id_date");
+  const base = dateInput?.value ? new Date(dateInput.value) : new Date();
+  calendarDate = new Date(base.getFullYear(), base.getMonth(), 1);
+  renderCalendar(base);
+}
+
+function renderCalendar(selectedDate) {
+  const grid = document.getElementById("calendar-grid");
+  const title = document.getElementById("calendar-title");
+  if (!grid || !title) return;
+
+  grid.innerHTML = "";
+  dayNames.forEach((d) => {
+    const el = document.createElement("span");
+    el.textContent = d;
+    el.style.fontWeight = "700";
+    grid.appendChild(el);
+  });
+
+  const year = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+  title.textContent = `${monthNames[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement("span");
+    empty.className = "att-day empty";
+    empty.textContent = ".";
+    grid.appendChild(empty);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cell = document.createElement("span");
+    cell.className = "att-day";
+    cell.textContent = String(d);
+    if (
+      selectedDate &&
+      d === selectedDate.getDate() &&
+      month === selectedDate.getMonth() &&
+      year === selectedDate.getFullYear()
+    ) {
+      cell.classList.add("mark");
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function changeMonth(offset) {
+  if (!calendarDate) return;
+  calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + offset, 1);
+  const dateInput = document.getElementById("id_date");
+  const selected = dateInput?.value ? new Date(dateInput.value) : null;
+  renderCalendar(selected);
+}
+
+document.getElementById('id_course')?.addEventListener('change', function() {
+  const courseId = this.value || '';
+  const target = courseId ? (`?course=${encodeURIComponent(courseId)}`) : '/attendance/mark/';
+  window.location.href = target;
+});
+document.getElementById('id_date')?.addEventListener('change', function() {
+  const selected = this.value ? new Date(this.value) : new Date();
+  calendarDate = new Date(selected.getFullYear(), selected.getMonth(), 1);
+  renderCalendar(selected);
+});
+initCalendar();
+</script>
+{% endblock %}

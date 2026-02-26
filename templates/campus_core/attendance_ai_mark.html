@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+.ai-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #e5ecea;
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(20, 38, 34, 0.08);
+    padding: 1rem;
+}
+.ai-wrap h2 { margin: 0 0 0.25rem; color: #21473f; }
+.ai-wrap p { margin: 0 0 0.9rem; color: #647b76; }
+.ai-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.9rem; }
+.ai-card { border: 1px solid #e3ece8; border-radius: 14px; padding: 0.75rem; background: #fbfdfc; }
+.ai-wrap form p { margin: 0.68rem 0; }
+.ai-wrap label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+    font-size: 0.86rem;
+    color: #49645e;
+}
+.ai-wrap input, .ai-wrap select {
+    width: 100%;
+    border: 1px solid #dce6e2;
+    border-radius: 10px;
+    padding: 0.58rem 0.62rem;
+}
+.ai-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+.ai-btn {
+    border: 1px solid #d4e2dd;
+    background: #fff;
+    color: #2c554c;
+    border-radius: 10px;
+    padding: 0.56rem 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+.ai-btn.primary { border-color: #2f7f6a; background: #2f7f6a; color: #fff; }
+.ai-btn.secondary { background: #f3f8f6; }
+.ai-video {
+    width: 100%;
+    max-height: 220px;
+    border: 1px solid #d8e5e1;
+    border-radius: 12px;
+    background: #0f1720;
+    object-fit: cover;
+}
+.ai-preview {
+    width: 100%;
+    margin-top: 0.5rem;
+    border: 1px solid #dde8e4;
+    border-radius: 12px;
+    display: none;
+}
+.face-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    margin-top: 0.6rem;
+    max-height: 430px;
+    overflow: auto;
+}
+.face-card {
+    border: 1px solid #dce7e3;
+    border-radius: 12px;
+    background: #fff;
+    padding: 0.45rem;
+    cursor: pointer;
+}
+.face-card.active { border-color: #2f7f6a; box-shadow: 0 0 0 2px #d4ece5 inset; }
+.face-card img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.face-card p { margin: 0.35rem 0 0; font-size: 0.8rem; color: #3f5e57; }
+.ai-note {
+    margin-top: 0.8rem;
+    border: 1px solid #e3ece8;
+    background: #f8fcfa;
+    border-radius: 12px;
+    padding: 0.7rem;
+    color: #607772;
+    font-size: 0.86rem;
+}
+@media (max-width: 900px) { .ai-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section class="ai-wrap">
+    <h2>AI Face Attendance</h2>
+    <p>Use camera capture, upload class image, or click a registered student photo to mark attendance automatically.</p>
+
+    <form method="post" enctype="multipart/form-data" id="ai-form">
+        {% csrf_token %}
+        <input type="hidden" name="selected_student_id" id="selected_student_id">
+
+        <div class="ai-grid">
+            <div class="ai-card">
+                <div>
+                    <label for="id_course">Course</label>
+                    {{ form.course }}
+                </div>
+                <div>
+                    <label for="id_date">Date</label>
+                    {{ form.date }}
+                </div>
+                <div>
+                    <label for="id_time_slot">Time Slot</label>
+                    {{ form.time_slot }}
+                </div>
+
+                <div style="margin-top:0.6rem;">
+                    <label for="id_class_image">Upload Class / Student Image</label>
+                    {{ form.class_image }}
+                </div>
+
+                <div style="margin-top:0.7rem;">
+                    <label>Camera Capture</label>
+                    <video id="camera-video" class="ai-video" autoplay playsinline muted></video>
+                    <canvas id="camera-canvas" style="display:none;"></canvas>
+                    <img id="camera-preview" class="ai-preview" alt="Captured Preview">
+                </div>
+
+                <div class="ai-actions">
+                    <button type="button" class="ai-btn secondary" onclick="openCamera()">Open Camera</button>
+                    <button type="button" class="ai-btn secondary" onclick="capturePhoto()">Capture Photo</button>
+                    <button type="button" class="ai-btn secondary" onclick="clearSelection()">Clear Selected Student</button>
+                </div>
+            </div>
+
+            <div class="ai-card">
+                <h3 style="margin:0; color:#2b574d; font-size:1rem;">Registered Student Faces</h3>
+                <p style="margin:0.3rem 0 0.45rem; font-size:0.82rem;">Click a student card to directly mark that student as present.</p>
+                <div class="face-grid" id="face-grid">
+                    {% for student in enrolled_face_students %}
+                    <div class="face-card" data-student-id="{{ student.id }}" onclick="selectStudent('{{ student.id }}', this)">
+                        <img src="{{ student.face_profile.face_image.url }}" alt="{{ student.registration_no }}">
+                        <p><strong>{{ student.registration_no }}</strong><br>{{ student.user.get_full_name|default:student.user.username }}</p>
+                    </div>
+                    {% empty %}
+                    <p style="font-size:0.85rem;color:#6b7f79;">No face-enrolled students in this course yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="ai-actions">
+            <button class="ai-btn primary" type="submit">Mark Attendance (AI)</button>
+            <a class="ai-btn" href="/attendance/mark/">Back to Manual Attendance</a>
+            <a class="ai-btn" href="/attendance/enroll/">Enroll Student Face</a>
+        </div>
+    </form>
+
+    <div class="ai-note">
+        Best accuracy: clear front-face registration photos, proper lighting, and no heavy blur in captured/uploaded image.
+    </div>
+</section>
+
+<script>
+let mediaStream = null;
+function openCamera() {
+  const video = document.getElementById('camera-video');
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then((stream) => {
+      mediaStream = stream;
+      video.srcObject = stream;
+    })
+    .catch(() => alert('Camera access denied or unavailable.'));
+}
+function capturePhoto() {
+  const video = document.getElementById('camera-video');
+  const canvas = document.getElementById('camera-canvas');
+  const preview = document.getElementById('camera-preview');
+  const input = document.getElementById('id_class_image');
+  if (!video.videoWidth) {
+    alert('Open camera first.');
+    return;
+  }
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'captured_face.jpg', { type: 'image/jpeg' });
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    preview.src = URL.createObjectURL(blob);
+    preview.style.display = 'block';
+  }, 'image/jpeg', 0.95);
+}
+function selectStudent(studentId, element) {
+  document.getElementById('selected_student_id').value = studentId;
+  document.querySelectorAll('.face-card').forEach((card) => card.classList.remove('active'));
+  element.classList.add('active');
+}
+function clearSelection() {
+  document.getElementById('selected_student_id').value = '';
+  document.querySelectorAll('.face-card').forEach((card) => card.classList.remove('active'));
+}
+document.getElementById('id_course')?.addEventListener('change', function() {
+  const courseId = this.value || '';
+  const target = courseId ? (`/attendance/ai-mark/?course=${encodeURIComponent(courseId)}`) : '/attendance/ai-mark/';
+  window.location.href = target;
+});
+window.addEventListener('beforeunload', () => {
+  if (mediaStream) mediaStream.getTracks().forEach((t) => t.stop());
+});
+</script>
+{% endblock %}
